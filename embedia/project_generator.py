@@ -58,7 +58,7 @@ class ProjectGenerator:
         if hasattr(model,"layers"):
             layers_embedia = embedia_model.set_layers(model.layers) 
         else:
-            layers_embedia = embedia_model.set_layers([model])
+            layers_embedia = embedia_model.set_layers([model]) #SVM
 
         # prepare folders and extension of files to copy/create
         self._prepare_folders(output_folder, project_name, options)

@@ -166,8 +166,12 @@ class Layer(object):
             prev_layer = self.model.get_previous_layer(self)
             if prev_layer is not None:
                 return prev_layer.get_output_shape()
-
-        s = self.layer.input_shape
+        
+        if hasattr(self.model,"layers"):  #SVM
+            s = self.layer.input_shape
+        else:
+            s = () 
+        
         if len(s) >= 1 and s[0] is None:
             return s[1:]
         return s
