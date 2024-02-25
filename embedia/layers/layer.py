@@ -25,7 +25,11 @@ class LayerInfo(object):
     def _update_properties(self):
         k_layer = self.layer.layer
         self.class_name = k_layer.__class__.__name__
-        self.layer_name = k_layer.name
+        if hasattr(self.model,"name"): #SVM
+            self.layer_name = k_layer.name
+        else: 
+            self.layer_name = "svc"
+
         if hasattr(k_layer, 'activation') and k_layer.activation is not None:
             activation = ActivationFunctions(None, k_layer.activation)
             self.activation = activation.get_function_name()
