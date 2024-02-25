@@ -14,22 +14,21 @@ class SVC_layer(DataLayer):
     
         init_svc_layer = f'''
         {struct_type} init_{name}_data(void){{
-        char * kernel_type = "{self.model.kernel.lower()}";
-        int degree = {self.model.degree};
-        double gamma = {self.model.gamma};
-        double  coef0 = {self.model.coef0};
-        double C = {self.model.C};
-        double rho[] = {'{' + ', '.join(map(str, self.model.intercept_)) + '}'};
-        int nSV[] = {'{' + ', '.join(map(str, self.model.n_support_)) + '}'};
+        char * kernel_type = "{self.layer.kernel.lower()}";
+        int degree = {self.layer.degree};
+        double gamma = {self.layer.gamma};
+        double  coef0 = {self.layer.coef0};
+        double C = {self.layer.C};
+        double rho[] = {'{' + ', '.join(map(str, self.layer.intercept_)) + '}'};
+        int nSV[] = {'{' + ', '.join(map(str, self.layer.n_support_)) + '}'};
         double SV[][] = {{'''
-        for vector in self.model.support_vectors_:
-            init_svm_layer += f'        {{' + ', '.join(map(str, vector)) + '}},\n'
-        init_svm_layer += '''    }};
+        for vector in self.layer.support_vectors_:
+            init_svc_layer += f'{{' + ', '.join(map(str, vector)) + '},\n'
+        init_svc_layer += f'''}};
         double dual_coef[][] = {{ '''
-        for row in self.model.dual_coef_:
-            init_svm_layer += f'        {{' + ', '.join(map(str, row)) + '}},\n'
-        
-        init_svm_layer += f'''    }};
+        for row in self.layer.dual_coef_:
+            init_svc_layer += f'{' + ', '.join(map(str, row)) + '},\n'
+        init_svc_layer += f'''}};
 
         svc_layer_t layer = {{
                 kernel_type,

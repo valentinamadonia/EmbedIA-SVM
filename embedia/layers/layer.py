@@ -25,7 +25,7 @@ class LayerInfo(object):
     def _update_properties(self):
         k_layer = self.layer.layer
         self.class_name = k_layer.__class__.__name__
-        if hasattr(self.model,"name"): #SVM
+        if hasattr(self,"name"): #SVM
             self.layer_name = k_layer.name
         else: 
             self.layer_name = "svc"
@@ -37,10 +37,16 @@ class LayerInfo(object):
             self.activation = None
 
         self.output_shape = self.layer.get_output_shape()
+        
+        if hasattr(self.layer.layer,"trainable_weights"): #SVM
+            trainable = int(np.sum([K.count_params(p) for p in k_layer.trainable_weights]))
+        else:
+            trainable = 0
+        if hasattr(self.layer.layer,"non_trainable_weights"): #SVM
+            non_trainable = int(np.sum([K.count_params(p) for p in k_layer.non_trainable_weights]))
+        else:
+            non_trainable = 0
 
-        trainable = int(np.sum([K.count_params(p) for p in k_layer.trainable_weights]))
-
-        non_trainable = int(np.sum([K.count_params(p) for p in k_layer.non_trainable_weights]))
         self.params = (trainable, non_trainable)
 
         self.macs_ops = self.layer.calculate_MAC()
@@ -174,7 +180,7 @@ class Layer(object):
         if hasattr(self.model,"layers"):  #SVM
             s = self.layer.input_shape
         else:
-            s = () 
+            s = self.layer.support_vectors_.shape[:-1]
         
         if len(s) >= 1 and s[0] is None:
             return s[1:]
@@ -196,7 +202,7 @@ class Layer(object):
         if hasattr(self.model,"layers"):  #SVM
             s = self.layer.output_shape
         else:
-            s = () 
+            s = (1,)
 
         if len(s) >= 1 and s[0] is None:
             return s[1:]
