@@ -88,7 +88,10 @@ class ProjectGenerator:
 
         # create model files
         if ProjectFiles.MODEL in options.files:
-            (text_model_h, text_model_c, filename) = generate_embedia_model(embedia_model, self._lib_folder, model.name, model_info, options)
+            if hasattr(model,"name"): #SVM
+                (text_model_h, text_model_c, filename) = generate_embedia_model(embedia_model, self._lib_folder, model.name, model_info, options)
+            else: 
+                (text_model_h, text_model_c, filename) = generate_embedia_model(embedia_model, self._lib_folder, "svc", model_info, options)
             file_management.save_to_file(os.path.join(self._dst_folder, filename + h_ext), text_model_h)
             file_management.save_to_file(os.path.join(self._dst_folder, filename + c_ext), text_model_c)
 
