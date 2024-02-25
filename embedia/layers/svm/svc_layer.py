@@ -23,12 +23,12 @@ class SVC_layer(DataLayer):
         int nSV[] = {'{' + ', '.join(map(str, self.layer.n_support_)) + '}'};
         double SV[][] = {{'''
         for vector in self.layer.support_vectors_:
-            init_svc_layer += f'{{' + ', '.join(map(str, vector)) + '},\n'
-        init_svc_layer += f'''}};
+            init_svc_layer += f'                {{' + ', '.join(map(str, vector)) + '},\n'
+        init_svc_layer += f'''              }};
         double dual_coef[][] = {{ '''
         for row in self.layer.dual_coef_:
-            init_svc_layer += f'{' + ', '.join(map(str, row)) + '},\n'
-        init_svc_layer += f'''}};
+            init_svc_layer += f'                {{' + ', '.join(map(str, row)) + '},\n'
+        init_svc_layer += f'''              }};
 
         svc_layer_t layer = {{
                 kernel_type,
