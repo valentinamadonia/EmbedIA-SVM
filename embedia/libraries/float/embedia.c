@@ -594,7 +594,145 @@ void image_adapt_layer(data3d_t input, data3d_t * output){
     }
  }
 
- 
+
 void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
 
+    uint32_t l,i,j,k;
+    
+    double *dec_values = malloc(sizeof(double) * svc_layer->nr_class*(svc_layer->nr_class-1)/2);
+    double *kvalue = malloc(sizeof(double) * svc_layer->nr_SV);
+    int *start = malloc(sizeof(int) * svc_layer->nr_class);
+    int *vote = malloc(sizeof(int) * svc_layer->nr_class);
+    uint32_t length_y = sizeof(svc_layer->SV) / sizeof(svc_layer->SV[0]);
+    for(l = 0; l < input->length; l++){
+            for(i=0;i< svc_layer->nr_SV ;i++) 
+                kvalue[i] = kernel_function(svc_layer,input->data[i],svc_layer->SV[i],input->length,length_y);
+            start[0] = 0;
+            for(i=1;i<svc_layer->nr_class;i++)
+                start[i] = start[i-1]+svc_layer->nSV[i-1];
+            for(i=0;i<svc_layer->nr_class;i++)
+                vote[i] = 0;
+            int p=0;
+            for(i=0;i<svc_layer->nr_class;i++) 
+                for(j=i+1;j<svc_layer->nr_class;j++)
+                {
+                    double sum = 0;
+                    int si = start[i];
+                    int sj = start[j];
+                    int ci = svc_layer->nSV[i];
+                    int cj = svc_layer->nSV[j];
+                    int k;
+                    double *coef1 = svc_layer.sv_coef[j-1];
+                    double *coef2 = svc_layer.sv_coef[i];
+                    for(k=0;k<ci;k++)
+                        sum += coef1[si+k] * kvalue[si+k];
+                    for(k=0;k<cj;k++)
+                        sum += coef2[sj+k] * kvalue[sj+k];
+                    sum -= svc_layer->rho[p];
+                    dec_values[p] = sum;
+                    if(dec_values[p] > 0)
+                        ++vote[i];
+                    else
+                        ++vote[j];
+                    p++;
+                }
+            int vote_max_idx = 0;
+            for(i=1;i<svc_layer->nr_class;i++)
+                if(vote[i] > vote[vote_max_idx])
+                        vote_max_idx = i;
+            output->data[l] = svc_layer->label[vote_max_idx];
+    }
+    free(kvalue);
+    free(start);
+    free(vote);
+    free(dec_values);
+}
+
+float kernel_function(svc_layer_t svc_layer, float *data, float *y,uint32_t length_data, uint32_t length_y)
+{
+
+   switch(svc_layer->kernel_type){
+       case linear:
+             return dot(data,y);
+       case poly:
+             return powi(svc_layer->gamma*dot(data,y,uint32_t length_data, uint32_t length_y)+svc_layer->coef0,svc_layer->degree);
+       case rbf:
+       {
+             float sum = 0;
+             uint32_t i=0,j=0;
+             while(length_data != i && length_y != j)
+             {
+                   if(data[i] == y[j])
+                   {
+                         double d = data[i] - y[j];
+                         sum += d*d;
+                         ++i;
+                         ++j;
+                   }
+                   else
+                   {
+                           if(i > j)
+                           {
+                                 sum += y[j] * y[j];
+                                 ++j;
+                           }
+                           else
+                           {
+                                 sum += data[i] * data[i];
+                                 ++i;
+                           }
+                   }
+             }
+             while(length_y != i)
+             {
+                   sum += data[i] * data[i];
+                   ++i;
+             }
+             while(length_y != j)
+             {
+                   sum += y[j] * y[j];
+                   ++j;
+             }
+             return exp(-svc_layer->gamma*sum);
+       }
+       case sigmoid:
+             return tanh(svc_layer->gamma*dot(x,y)+svc_layer->coef0);
+       default:
+             return 0;
+     }
+}
+
+float dot(float *data, float *y,uint32_t length_data, uint32_t length_y)
+{
+   float sum = 0;
+   uint32_t i,j;
+   while(length_data != i && length_y != j)
+   {
+         if(i == j)
+         {
+               sum += data[i] * y[j];
+               ++i;
+               ++j;
+          }
+          else
+          {
+               if(i > j)
+                     ++j;
+               else
+                     ++i;
+           }
+   }
+   return sum;
+}
+
+float powi(float base, int times)
+{
+   float tmp = base, ret = 1.0;
+   int t;
+   for(t=times; t>0; t/=2)
+   {
+         if(t%2==1) ret*=tmp;
+         tmp = tmp * tmp;
+   }
+   return ret;
 }
