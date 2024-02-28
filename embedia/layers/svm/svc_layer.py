@@ -14,16 +14,15 @@ class SVC_layer(DataLayer):
     
         init_svc_layer = f'''
         {struct_type} init_{name}_data(void){{
-        int nr_class = {self.layer.classes_.size};
-        int nr_SV = {len(self.layer.support_)};
-        int label[] = {'{' + ', '.join(map(str, self.layer.classes_)) + '}'};
+        uint16_t nr_class = {self.layer.classes_.size};
+        uint16_t nr_SV = {len(self.layer.support_)};
+        uint16_t label[] = {'{' + ', '.join(map(str, self.layer.classes_)) + '}'};
         char * kernel_type = "{self.layer.kernel.lower()}";
-        int degree = {self.layer.degree};
+        uint16_t degree = {self.layer.degree};
         float gamma = {self.layer.gamma};
         float  coef0 = {self.layer.coef0};
-        float C = {self.layer.C};
         float rho[] = {'{' + ', '.join(map(str, self.layer.intercept_)) + '}'};
-        int nSV[] = {'{' + ', '.join(map(str, self.layer.n_support_)) + '}'};
+        uint16_t nSV[] = {'{' + ', '.join(map(str, self.layer.n_support_)) + '}'};
         float SV[][] = {{'''
         for vector in self.layer.support_vectors_:
             init_svc_layer += f'        {{' + ', '.join(map(str, vector)) + '},\n'
@@ -40,12 +39,11 @@ class SVC_layer(DataLayer):
                 degree,
                 gamma,
                 coef0,
-                C,
-                {{{{sizeof(rho) / sizeof(label[0])}}, label}},
-                {{{{sizeof(rho) / sizeof(rho[0])}}, rho}},
-                {{{{sizeof(nSV) / sizeof(nSV[0])}}, nSV}},
-                {{{{sizeof(SV) / sizeof(SV[0])}}, SV}},
-                {{{{sizeof(dual_coef) / sizeof(dual_coef[0])}}, dual_coef}}
+                label,
+                rho,
+                nSV,
+                SV,
+                dual_coef
         }};
             return layer;
         }}

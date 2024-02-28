@@ -124,6 +124,23 @@ typedef struct{
     uint16_t strides;
 } pooling2d_layer_t;
 
+/*
+ * SVC struct
+ */
+typedef struct{
+    uint16_t nr_class;
+    uint16_t nr_SV;
+    char * kernel_type;
+    uint16_t degree;
+    float gamma;
+    float coef0;
+    uint16_t *label;
+    float *rho;
+    uint16_t *nSV;
+    float **SV;
+    float **dual_coef;
+}svc_layer_t;
+
 /*********************************************************************************************************************************/
 
 /* structure for normalization type (x_i-s_i)/d_i and (x_i)/d_i

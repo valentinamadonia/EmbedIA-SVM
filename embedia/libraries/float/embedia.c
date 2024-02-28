@@ -604,9 +604,10 @@ void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
     int *start = malloc(sizeof(int) * svc_layer->nr_class);
     int *vote = malloc(sizeof(int) * svc_layer->nr_class);
     uint32_t length_y = sizeof(svc_layer->SV) / sizeof(svc_layer->SV[0]);
+    uint32_t length_data = sizeof(input->data) / sizeof(input->data[0]);
     for(l = 0; l < input->length; l++){
             for(i=0;i< svc_layer->nr_SV ;i++) 
-                kvalue[i] = kernel_function(svc_layer,input->data[i],svc_layer->SV[i],input->length,length_y);
+                kvalue[i] = kernel_function(svc_layer,input->data[l],svc_layer->SV[i],length_data,length_y);
             start[0] = 0;
             for(i=1;i<svc_layer->nr_class;i++)
                 start[i] = start[i-1]+svc_layer->nSV[i-1];
@@ -652,11 +653,11 @@ float kernel_function(svc_layer_t svc_layer, float *data, float *y,uint32_t leng
 {
 
    switch(svc_layer->kernel_type){
-       case linear:
+       case "linear":
              return dot(data,y);
-       case poly:
-             return powi(svc_layer->gamma*dot(data,y,uint32_t length_data, uint32_t length_y)+svc_layer->coef0,svc_layer->degree);
-       case rbf:
+       case "poly":
+             return powi(svc_layer->gamma*dot(data,y,length_data,length_y)+svc_layer->coef0,svc_layer->degree);
+       case "rbf":
        {
              float sum = 0;
              uint32_t i=0,j=0;
@@ -695,8 +696,8 @@ float kernel_function(svc_layer_t svc_layer, float *data, float *y,uint32_t leng
              }
              return exp(-svc_layer->gamma*sum);
        }
-       case sigmoid:
-             return tanh(svc_layer->gamma*dot(x,y)+svc_layer->coef0);
+       case "sigmoid":
+             return tanh(svc_layer->gamma*dot(data,y)+svc_layer->coef0);
        default:
              return 0;
      }
