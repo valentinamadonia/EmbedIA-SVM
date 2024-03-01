@@ -23,11 +23,11 @@ class SVC_layer(DataLayer):
         float  coef0 = {self.layer.coef0};
         float rho[] = {'{' + ', '.join(map(str, self.layer.intercept_)) + '}'};
         uint16_t nSV[] = {'{' + ', '.join(map(str, self.layer.n_support_)) + '}'};
-        float SV[][] = {{'''
+        float SV[][{self.layer.n_features_in_}]] = {{'''
         for vector in self.layer.support_vectors_:
             init_svc_layer += f'        {{' + ', '.join(map(str, vector)) + '},\n'
         init_svc_layer += f'''        }};
-        float dual_coef[][] = {{ '''
+        float dual_coef[][{self.layer.dual_coef_[:1].size}] = {{ '''
         for row in self.layer.dual_coef_:
             init_svc_layer += f'        {{' + ', '.join(map(str, row)) + '},\n'
         init_svc_layer += f'''        }};

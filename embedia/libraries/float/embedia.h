@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include <math.h>
+#include <string.h>
 {includes}
 
 
@@ -333,5 +334,12 @@ void batch_normalization1d_layer(batch_normalization_layer_t layer, data1d_t *da
    Usually required for first convolutional layer
 */
 void image_adapt_layer(data3d_t input, data3d_t * output);
+
+/* SVC
+ *
+ */
+float kernel_function(svc_layer_t svc_layer, float *data, float *y,uint32_t length_data, uint32_t length_y);
+float dot(float *data, float *y,uint32_t length_data, uint32_t length_y);
+float powi(float base, int times);
 
 #endif
