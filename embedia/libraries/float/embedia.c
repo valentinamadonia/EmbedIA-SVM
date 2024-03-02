@@ -597,20 +597,18 @@ void image_adapt_layer(data3d_t input, data3d_t * output){
 
 void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
 
-    uint32_t l,i,j;
+    uint32_t i,j;
 
     output->length = input.length;
-    output->data = (float*)swap_alloc(sizeof(float)*input.length);
+    output->data = (float*)swap_alloc(sizeof(float)*1);
 
     double *dec_values = malloc(sizeof(double) * svc_layer.nr_class*(svc_layer.nr_class-1)/2);
     double *kvalue = malloc(sizeof(double) * svc_layer.nr_SV);
     int *start = malloc(sizeof(int) * svc_layer.nr_class);
     int *vote = malloc(sizeof(int) * svc_layer.nr_class);
-    uint32_t length_y = sizeof(svc_layer.SV) / sizeof(svc_layer.SV[0]);
-    uint32_t length_data = sizeof(input.data) / sizeof(input.data[0]);
     for(l = 0; l < input.length; l++){
             for(i=0;i< svc_layer.nr_SV ;i++) 
-                kvalue[i] = kernel_function(svc_layer,&input.data[l],svc_layer.SV[i],length_data,length_y);
+                kvalue[i] = kernel_function(svc_layer,input.data,svc_layer.SV[i],(float)input.length,(float)input.length);
             start[0] = 0;
             for(i=1;i<svc_layer.nr_class;i++)
                 start[i] = start[i-1]+svc_layer.nSV[i-1];
@@ -644,7 +642,7 @@ void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
             for(i=1;i<svc_layer.nr_class;i++)
                 if(vote[i] > vote[vote_max_idx])
                         vote_max_idx = i;
-            output->data[l] = svc_layer.label[vote_max_idx];
+            output->data[0] = svc_layer.label[vote_max_idx];
     }
     free(kvalue);
     free(start);
@@ -655,9 +653,9 @@ void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
 float kernel_function(svc_layer_t svc_layer, float *data, float *y,uint32_t length_data, uint32_t length_y)
 {
    if (strcmp(svc_layer.kernel_type, "linear") == 0) {
-             return dot(data,y,length_data,length_y);
+             return dot(data,y,length_data);
    } else if (strcmp(svc_layer.kernel_type, "polynomial") == 0) {
-            return powi(svc_layer.gamma*dot(data,y,length_data,length_y)+svc_layer.coef0,svc_layer.degree);
+            return powi(svc_layer.gamma*dot(data,y,length_data)+svc_layer.coef0,svc_layer.degree);
        	  }else if (strcmp(svc_layer.kernel_type, "rbf") == 0) {
              		float sum = 0;
              		uint32_t i=0,j=0;
@@ -696,29 +694,15 @@ float kernel_function(svc_layer_t svc_layer, float *data, float *y,uint32_t leng
                		}
                		return exp(-svc_layer.gamma*sum);
          	    }else if (strcmp(svc_layer.kernel_type, "sigmoid") == 0) {
-             			return tanh(svc_layer.gamma*dot(data,y,length_data,length_y)+svc_layer.coef0);
+             			return tanh(svc_layer.gamma*dot(data,y,length_data)+svc_layer.coef0);
        		        }else return 0;
 }
 
-float dot(float *data, float *y,uint32_t length_data, uint32_t length_y)
+float dot(float *data, float *y,float length_data)
 {
    float sum = 0;
-   uint32_t i,j;
-   while(length_data != i && length_y != j)
-   {
-         if(i == j)
-         {
-               sum += data[i] * y[j];
-               ++i;
-               ++j;
-          }
-          else
-          {
-               if(i > j)
-                     ++j;
-               else
-                     ++i;
-           }
+   for(int i=0; i < length_data; i++){
+        sum+=data[i] * y[i];
    }
    return sum;
 }

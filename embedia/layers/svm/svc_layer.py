@@ -39,7 +39,7 @@ class SVC_layer(DataLayer):
         memcpy(nSV,copied_nSV,sizeof(uint16_t) * {self.layer.n_support_.size});
 
         float **SV;
-        SV = malloc( sizeof(float) * nr_SV);
+        SV = malloc( sizeof(float*) * nr_SV);
         for(i= 0 ; i<nr_SV; i++)
             SV[i]= malloc( sizeof(float) * { self.layer.support_vectors_[0].size});
         '''
@@ -48,7 +48,7 @@ class SVC_layer(DataLayer):
         
         init_svc_layer += f'''
         float **dual_coef;
-        dual_coef = malloc( sizeof(float) * nr_class - 1);
+        dual_coef = malloc( sizeof(float*) * nr_class - 1);
         for(i= 0 ; i<nr_class - 1; i++)
             dual_coef[i]= malloc( sizeof(float) * nr_SV);
         '''
@@ -71,7 +71,20 @@ class SVC_layer(DataLayer):
         }};
             return layer;
         }}
+        
+        for (int i = 0; i < s_v_c_data.nr_SV; i++) {{
+        	free(s_v_c_data.SV[i])
+    	}}
+    	free(s_v_c_data.SV);
+    	for (int i = 0; i < s_v_c_data.nr_class -1; i++) {{
+        	free(s_v_c_data.dual_coef[i]);
+    	}}
+    	free(s_v_c_data.dual_coef);
+    	free(s_v_c_data.label);
+    	free(s_v_c_data.rho);
+    	free(s_v_c_data.nSV);
         '''
+
         return init_svc_layer
     
     def predict(self, input_name, output_name):
