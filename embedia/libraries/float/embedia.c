@@ -606,7 +606,6 @@ void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
     double *kvalue = malloc(sizeof(double) * svc_layer.nr_SV);
     int *start = malloc(sizeof(int) * svc_layer.nr_class);
     int *vote = malloc(sizeof(int) * svc_layer.nr_class);
-    for(l = 0; l < input.length; l++){
             for(i=0;i< svc_layer.nr_SV ;i++) 
                 kvalue[i] = kernel_function(svc_layer,input.data,svc_layer.SV[i],(float)input.length,(float)input.length);
             start[0] = 0;
@@ -643,14 +642,13 @@ void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
                 if(vote[i] > vote[vote_max_idx])
                         vote_max_idx = i;
             output->data[0] = svc_layer.label[vote_max_idx];
-    }
     free(kvalue);
     free(start);
     free(vote);
     free(dec_values);
 }
 
-float kernel_function(svc_layer_t svc_layer, float *data, float *y,uint32_t length_data, uint32_t length_y)
+float kernel_function(svc_layer_t svc_layer, float *data, float *y,float length_data, float length_y)
 {
    if (strcmp(svc_layer.kernel_type, "linear") == 0) {
              return dot(data,y,length_data);
