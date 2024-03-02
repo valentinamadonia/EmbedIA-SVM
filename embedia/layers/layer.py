@@ -180,7 +180,7 @@ class Layer(object):
         if hasattr(self.model,"layers"):  #SVM
             s = self.layer.input_shape
         else:
-            s = (self.layer.n_features_in_)
+            s = (self.layer.n_features_in_,)
         
         if len(s) >= 1 and s[0] is None:
             return s[1:]
@@ -202,7 +202,7 @@ class Layer(object):
         if hasattr(self.model,"layers"):  #SVM
             s = self.layer.output_shape
         else:
-            s = (1)
+            s = (1,)
 
         if len(s) >= 1 and s[0] is None:
             return s[1:]
