@@ -17,13 +17,27 @@ class SVC_layer(DataLayer):
         uint16_t i,j;
         uint16_t nr_class = {self.layer.classes_.size};
         uint16_t nr_SV = {len(self.layer.support_)};
-        uint16_t label[] = {'{' + ', '.join(map(str, self.layer.classes_)) + '}'};
+
+        uint16_t *label;
+        label = malloc( sizeof(uint16_t) * nr_class);
+        uint16_t copied_label[] = {'{' + ', '.join(map(str, self.layer.classes_)) + '}'};
+        memcpy(label,copied_label,sizeof(uint16_t) * nr_class);
+
         char * kernel_type = "{self.layer.kernel.lower()}";
         uint16_t degree = {self.layer.degree};
         float gamma = {self.layer.gamma};
         float  coef0 = {self.layer.coef0};
-        float rho[] = {'{' + ', '.join(map(str, self.layer.intercept_)) + '}'};
-        uint16_t nSV[] = {'{' + ', '.join(map(str, self.layer.n_support_)) + '}'};
+
+        float *rho;
+        rho = malloc(sizeof(float) * {self.layer.intercept_.size});
+        float copied_rho[] = {'{' + ', '.join(map(str, self.layer.intercept_)) + '}'};
+        memcpy(rho,copied_rho,sizeof(float) * {self.layer.intercept_.size});
+
+        uint16_t *nSV;
+        nSV = malloc(sizeof(uint16_t) * {self.layer.n_support_.size});
+        uint16_t copied_nSV[] = {'{' + ', '.join(map(str, self.layer.n_support_)) + '}'};
+        memcpy(nSV,copied_nSV,sizeof(uint16_t) * {self.layer.n_support_.size});
+
         float **SV;
         SV = malloc( sizeof(float) * nr_SV);
         for(i= 0 ; i<nr_SV; i++)
@@ -38,8 +52,8 @@ class SVC_layer(DataLayer):
         for(i= 0 ; i<nr_class - 1; i++)
             dual_coef[i]= malloc( sizeof(float) * nr_SV);
         '''
-        for i in range(len(self.layer.classes_.size)):  
-            init_svc_layer += f'    memcpy(dual_coef[{i}], (float[]) {{' + ', '.join(map(str,self.layer.dual_coef_[i])) + f'}},sizeof(float) * {self.layer.classes_.size});\n'
+        for i in range(self.layer.classes_.size - 1):  
+            init_svc_layer += f'    memcpy(dual_coef[{i}], (float[]) {{' + ', '.join(map(str,self.layer.dual_coef_[i])) + f'}},sizeof(float) * nrSV);\n'
 
         init_svc_layer += f'''
         svc_layer_t layer = {{
