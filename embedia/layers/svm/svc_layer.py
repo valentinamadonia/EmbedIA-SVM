@@ -14,6 +14,7 @@ class SVC_layer(DataLayer):
     
         init_svc_layer = f'''
         {struct_type} init_{name}_data(void){{
+        uint16_t i,j;
         uint16_t nr_class = {self.layer.classes_.size};
         uint16_t nr_SV = {len(self.layer.support_)};
         uint16_t label[] = {'{' + ', '.join(map(str, self.layer.classes_)) + '}'};
@@ -23,10 +24,15 @@ class SVC_layer(DataLayer):
         float  coef0 = {self.layer.coef0};
         float rho[] = {'{' + ', '.join(map(str, self.layer.intercept_)) + '}'};
         uint16_t nSV[] = {'{' + ', '.join(map(str, self.layer.n_support_)) + '}'};
-        float SV[][{self.layer.n_features_in_}]] = {{'''
-        for vector in self.layer.support_vectors_:
-            init_svc_layer += f'        {{' + ', '.join(map(str, vector)) + '},\n'
-        init_svc_layer += f'''        }};
+        float **SV
+        SV = malloc( sizeof(float) * nr_SV);
+        for(i= 0 ; i<nr_SV; i++)
+            SV[i]= malloc( sizeof(float) * { self.layer.classifier.support_vectors_[0].size});
+        '''
+        for i in range(len(self.layer.support_)):  
+            init_svc_layer += f'        SV[{i}] = {{' + ', '.join(map(str,self.layer.support_vectors[i])) + '};\n'
+        
+        '''
         float dual_coef[][{self.layer.dual_coef_[:1].size}] = {{ '''
         for row in self.layer.dual_coef_:
             init_svc_layer += f'        {{' + ', '.join(map(str, row)) + '},\n'

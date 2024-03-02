@@ -598,7 +598,10 @@ void image_adapt_layer(data3d_t input, data3d_t * output){
 void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
 
     uint32_t l,i,j;
-    
+
+    output->length = input.length;
+    output->data = (float*)swap_alloc(sizeof(float)*input.length);
+
     double *dec_values = malloc(sizeof(double) * svc_layer.nr_class*(svc_layer.nr_class-1)/2);
     double *kvalue = malloc(sizeof(double) * svc_layer.nr_SV);
     int *start = malloc(sizeof(int) * svc_layer.nr_class);
@@ -651,7 +654,6 @@ void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
 
 float kernel_function(svc_layer_t svc_layer, float *data, float *y,uint32_t length_data, uint32_t length_y)
 {
-
    if (strcmp(svc_layer.kernel_type, "linear") == 0) {
              return dot(data,y,length_data,length_y);
    } else if (strcmp(svc_layer.kernel_type, "polynomial") == 0) {
