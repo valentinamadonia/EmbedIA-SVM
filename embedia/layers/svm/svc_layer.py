@@ -30,14 +30,18 @@ class SVC_layer(DataLayer):
             SV[i]= malloc( sizeof(float) * { self.layer.support_vectors_[0].size});
         '''
         for i in range(len(self.layer.support_)):  
-            init_svc_layer += f'memcpySV[{i}], (float[]) {{' + ', '.join(map(str,self.layer.support_vectors_[i])) + f'}},sizeof(float) * { self.layer.support_vectors_[0].size});\n'
+            init_svc_layer += f'    memcpy(SV[{i}], (float[]) {{' + ', '.join(map(str,self.layer.support_vectors_[i])) + f'}},sizeof(float) * { self.layer.support_vectors_[0].size});\n'
         
         init_svc_layer += f'''
-        float dual_coef[][{self.layer.dual_coef_[:1].size}] = {{ '''
-        for row in self.layer.dual_coef_:
-            init_svc_layer += f'        {{' + ', '.join(map(str, row)) + '},\n'
-        init_svc_layer += f'''        }};
+        float **dual_coef;
+        dual_coef = malloc( sizeof(float) * nr_class - 1);
+        for(i= 0 ; i<nr_class - 1; i++)
+            dual_coef[i]= malloc( sizeof(float) * nr_SV);
+        '''
+        for i in range(len(self.layer.classes_.size)):  
+            init_svc_layer += f'    memcpy(dual_coef[{i}], (float[]) {{' + ', '.join(map(str,self.layer.dual_coef_[i])) + f'}},sizeof(float) * {self.layer.classes_.size});\n'
 
+        init_svc_layer += f'''
         svc_layer_t layer = {{
                 nr_class,
                 nr_SV,
