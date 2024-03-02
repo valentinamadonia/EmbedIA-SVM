@@ -338,6 +338,7 @@ void image_adapt_layer(data3d_t input, data3d_t * output);
 /* SVC
  *
  */
+
 float kernel_function(svc_layer_t svc_layer, float *data, float *y,float length_data, float length_y);
 float dot(float *data, float *y,float length_data);
 float powi(float base, int times);
