@@ -18,25 +18,16 @@ class SVC_layer(DataLayer):
         uint16_t nr_class = {self.layer.classes_.size};
         uint16_t nr_SV = {len(self.layer.support_)};
 
-        uint16_t *label;
-        label = malloc( sizeof(uint16_t) * nr_class);
-        uint16_t copied_label[] = {'{' + ', '.join(map(str, self.layer.classes_)) + '}'};
-        memcpy(label,copied_label,sizeof(uint16_t) * nr_class);
+        uint16_t label[] = {'{' + ', '.join(map(str, self.layer.classes_)) + '}'};
 
         char * kernel_type = "{self.layer.kernel.lower()}";
         uint16_t degree = {self.layer.degree};
         float gamma = {self.layer.gamma};
         float  coef0 = {self.layer.coef0};
 
-        float *rho;
-        rho = malloc(sizeof(float) * {self.layer.intercept_.size});
-        float copied_rho[] = {'{' + ', '.join(map(str, self.layer.intercept_)) + '}'};
-        memcpy(rho,copied_rho,sizeof(float) * {self.layer.intercept_.size});
+        float rho[] = {'{' + ', '.join(map(str, self.layer.intercept_)) + '}'};
 
-        uint16_t *nSV;
-        nSV = malloc(sizeof(uint16_t) * {self.layer.n_support_.size});
-        uint16_t copied_nSV[] = {'{' + ', '.join(map(str, self.layer.n_support_)) + '}'};
-        memcpy(nSV,copied_nSV,sizeof(uint16_t) * {self.layer.n_support_.size});
+        uint16_t nSV[] = {'{' + ', '.join(map(str, self.layer.n_support_)) + '}'};
 
         float **SV;
         SV = malloc( sizeof(float*) * nr_SV);

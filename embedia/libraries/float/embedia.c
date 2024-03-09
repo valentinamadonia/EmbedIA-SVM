@@ -602,14 +602,10 @@ void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
     output->length = input.length;
     output->data = (float*)swap_alloc(sizeof(float)*1);
 
-    //double *dec_values = malloc(sizeof(double) * svc_layer.nr_class*(svc_layer.nr_class-1)/2);
-    static float dec_values[svc_layer.nr_class*(svc_layer.nr_class-1)/2];
-    //double *kvalue = malloc(sizeof(double) * svc_layer.nr_SV);
-    static float kvalue[svc_layer.nr_SV];
-    //int *start = malloc(sizeof(int) * svc_layer.nr_class);
-    static uint16_t start[svc_layer.nr_class];
-    //int *vote = malloc(sizeof(int) * svc_layer.nr_class);
-    static uint16_t vote[svc_layer.nr_class];
+    float dec_values[svc_layer.nr_class*(svc_layer.nr_class-1)/2];
+    float kvalue[svc_layer.nr_SV];
+    uint16_t start[svc_layer.nr_class];
+    uint16_t vote[svc_layer.nr_class];
             for(i=0;i< svc_layer.nr_SV ;i++) 
                 kvalue[i] = kernel_function(svc_layer,input.data,svc_layer.SV[i],(float)input.length,(float)input.length);
             start[0] = 0;
@@ -646,10 +642,6 @@ void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
                 if(vote[i] > vote[vote_max_idx])
                         vote_max_idx = i;
             output->data[0] = svc_layer.label[vote_max_idx];
-    // free(kvalue);
-    // free(start);
-    // free(vote);
-    // free(dec_values);
 }
 
 float kernel_function(svc_layer_t svc_layer, float *data, float *y,float length_data, float length_y)
