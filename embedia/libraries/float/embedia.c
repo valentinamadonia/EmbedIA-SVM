@@ -652,40 +652,12 @@ float kernel_function(svc_layer_t svc_layer, float *data, float *y,float length_
             return powi(svc_layer.gamma*dot(data,y,length_data)+svc_layer.coef0,svc_layer.degree);
        	  }else if (strcmp(svc_layer.kernel_type, "rbf") == 0) {
              		float sum = 0;
-             		uint32_t i=0,j=0;
-             		while(length_data != i && length_y != j)
-             		{
-                   		if(data[i] == y[j])
-                   		{
-                        		double d = data[i] - y[j];
-                       		        sum += d*d;
-                         		++i;
-                         		++j;
-                   		}
-                   		else
-                   		{
-                           		if(i > j)
-                           		{
-                                 		sum += y[j] * y[j];
-                                 		++j;
-                           		}
-                           		else
-                           		{
-                                 		sum += data[i] * data[i];
-                                 		++i;
-                           		}
-                   		}
-               		}
-               		while(length_y != i)
-               		{
-                   		sum += data[i] * data[i];
-                   		++i;
-               		}
-               		while(length_y != j)
-               		{
-                   		sum += y[j] * y[j];
-                   		++j;
-               		}
+                    float sub = 0;
+             		uint32_t i = 0;
+             		for(i=0; i<length_data; i++){
+                        sub = fabs(data[i] - y[i]);
+                        sum+= sub * sub;
+                    }
                		return exp(-svc_layer.gamma*sum);
          	    }else if (strcmp(svc_layer.kernel_type, "sigmoid") == 0) {
              			return tanh(svc_layer.gamma*dot(data,y,length_data)+svc_layer.coef0);

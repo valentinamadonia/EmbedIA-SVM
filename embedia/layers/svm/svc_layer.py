@@ -67,9 +67,6 @@ class SVC_layer(DataLayer):
         	free(s_v_c_data.dual_coef[i]);
     	}}
     	free(s_v_c_data.dual_coef);
-    	free(s_v_c_data.label);
-    	free(s_v_c_data.rho);
-    	free(s_v_c_data.nSV);
 
             return layer;
         }}
