@@ -607,7 +607,7 @@ void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
     uint16_t start[svc_layer.nr_class];
     uint16_t vote[svc_layer.nr_class];
             for(i=0;i< svc_layer.nr_SV ;i++) 
-                kvalue[i] = kernel_function(svc_layer,input.data,svc_layer.SV[i],(float)input.length,(float)input.length);
+                kvalue[i] = kernel_function(svc_layer,input.data,svc_layer.SV[i],(float)input.length);
             start[0] = 0;
             for(i=1;i<svc_layer.nr_class;i++)
                 start[i] = start[i-1]+svc_layer.nSV[i-1];
@@ -644,7 +644,7 @@ void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
             output->data[0] = svc_layer.label[vote_max_idx];
 }
 
-float kernel_function(svc_layer_t svc_layer, float *data, float *y,float length_data, float length_y)
+float kernel_function(svc_layer_t svc_layer, float *data, float *y,float length_data)
 {
    if (strcmp(svc_layer.kernel_type, "linear") == 0) {
              return dot(data,y,length_data);
