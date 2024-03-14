@@ -629,7 +629,7 @@ void svc_layer(svc_layer_t svc_layer, data1d_t input, data1d_t * output){
                         sum += coef1[si+k] * kvalue[si+k];
                     for(k=0;k<cj;k++)
                         sum += coef2[sj+k] * kvalue[sj+k];
-                    sum -= svc_layer.rho[p];
+                    sum += svc_layer.rho[p];
                     dec_values[p] = sum;
                     if(dec_values[p] > 0)
                         ++vote[i];
