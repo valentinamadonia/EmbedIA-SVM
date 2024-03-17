@@ -33,14 +33,14 @@ class SVC_layer(DataLayer):
         '''
         for i in range(len(self.layer.support_)):  
             init_svc_layer += f'   static float SV{i}[] = {{' + ', '.join(map(str,self.layer.support_vectors_[i])) + f'}};\n'
-            init_svc_layer += f'   SV[{i}] = SV{i};'
+            init_svc_layer += f'   SV[{i}] = SV{i};\n'
         
         init_svc_layer += f'''
         static float *dual_coef[{self.layer.classes_.size - 1}];
         '''
         for i in range(self.layer.classes_.size - 1):  
             init_svc_layer += f'   static float d_coef{i}[] ={{' + ', '.join(map(str,self.layer.dual_coef_[i])) + f'}};\n'
-            init_svc_layer += f'   dual_coef[{i}] = d_coef{i};'
+            init_svc_layer += f'   dual_coef[{i}] = d_coef{i};\n'
         init_svc_layer += f'''
         svc_layer_t layer = {{
                 nr_class,
@@ -55,15 +55,6 @@ class SVC_layer(DataLayer):
                 SV,
                 dual_coef
         }};
-
-        for (i = 0; i < s_v_c_data.nr_SV; i++) {{
-        	free(s_v_c_data.SV[i]);
-    	}}
-    	free(s_v_c_data.SV);
-    	for (i = 0; i < s_v_c_data.nr_class -1; i++) {{
-        	free(s_v_c_data.dual_coef[i]);
-    	}}
-    	free(s_v_c_data.dual_coef);
 
             return layer;
         }}
