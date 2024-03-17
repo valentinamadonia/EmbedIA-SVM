@@ -18,32 +18,29 @@ class SVC_layer(DataLayer):
         uint16_t nr_class = {self.layer.classes_.size};
         uint16_t nr_SV = {len(self.layer.support_)};
 
-        uint16_t label[] = {'{' + ', '.join(map(str, self.layer.classes_)) + '}'};
+        static uint16_t label[] = {'{' + ', '.join(map(str, self.layer.classes_)) + '}'};
 
         char * kernel_type = "{self.layer.kernel.lower()}";
         uint16_t degree = {self.layer.degree};
         float gamma = {self.layer.gamma};
         float  coef0 = {self.layer.coef0};
 
-        float rho[] = {'{' + ', '.join(map(str, self.layer.intercept_)) + '}'};
+        static float rho[] = {'{' + ', '.join(map(str, self.layer.intercept_)) + '}'};
 
-        uint16_t nSV[] = {'{' + ', '.join(map(str, self.layer.n_support_)) + '}'};
+        static uint16_t nSV[] = {'{' + ', '.join(map(str, self.layer.n_support_)) + '}'};
 
-        float **SV;
-        SV = malloc( sizeof(float*) * nr_SV);
-        for(i= 0 ; i<nr_SV; i++) SV[i]= malloc( sizeof(float) * { self.layer.support_vectors_[0].size});
+        static float * SV[{len(self.layer.support_)}];
         '''
         for i in range(len(self.layer.support_)):  
-            init_svc_layer += f'    memcpy(SV[{i}], (float[]) {{' + ', '.join(map(str,self.layer.support_vectors_[i])) + f'}},sizeof(float) * { self.layer.support_vectors_[0].size});\n'
+            init_svc_layer += f'   static float SV{i}[] = {{' + ', '.join(map(str,self.layer.support_vectors_[i])) + f'}};\n'
+            init_svc_layer += f'   SV[{i}] = SV{i};'
         
         init_svc_layer += f'''
-        float **dual_coef;
-        dual_coef = malloc( sizeof(float*) * nr_class - 1);
-        for(i= 0 ; i<nr_class - 1; i++) dual_coef[i]= malloc( sizeof(float) * nr_SV);
+        static float *dual_coef[{self.layer.classes_.size - 1}];
         '''
         for i in range(self.layer.classes_.size - 1):  
-            init_svc_layer += f'    memcpy(dual_coef[{i}], (float[]) {{' + ', '.join(map(str,self.layer.dual_coef_[i])) + f'}},sizeof(float) * nr_SV);\n'
-
+            init_svc_layer += f'   static float d_coef{i}[] ={{' + ', '.join(map(str,self.layer.dual_coef_[i])) + f'}};\n'
+            init_svc_layer += f'   dual_coef[{i}] = d_coef{i};'
         init_svc_layer += f'''
         svc_layer_t layer = {{
                 nr_class,
